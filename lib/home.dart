@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_tutorial/widgets/allTodotitle.dart';
 import 'package:todo_tutorial/widgets/emptyList.dart';
-import 'package:todo_tutorial/widgets/todoWidget.dart';
-import 'data/todoData.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -58,10 +56,6 @@ class _HomeState extends State<Home> {
                 color: Colors.black,
                 onPressed: () {
                   print("Todo Created");
-                  setState(() {
-                    todo.add(_todoController.text);
-                    _todoController.clear();
-                  });
                 },
                 child: Text(
                   "Create Todo",
@@ -76,18 +70,7 @@ class _HomeState extends State<Home> {
             SizedBox(
               height: 15,
             ),
-            todo.length == 0
-                ? emptyList()
-                : Expanded(
-                    child: ListView.builder(
-                    itemCount: todo.length,
-                    itemBuilder: (context, index) {
-                      return Dismissible(
-                          key: Key(todo[index]),
-                          onDismissed: (direction) => todo.remove(todo[index]),
-                          child: todoWidget(todo[index]));
-                    },
-                  )),
+            emptyList(),
           ],
         ),
       ),
