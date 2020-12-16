@@ -26,5 +26,5 @@ Here's how you can get started..
 5. Create a new flutter project by typing "flutter create project_name" in the terminal
 
 App Screenshots:
-![Screenshots][screenshots\s1.png]
-![Screenshots][screenshots\s2.png]
+![Screenshot 1 ](screenshots\s1.png)
+![Screenshot 2](screenshots\s2.png)
