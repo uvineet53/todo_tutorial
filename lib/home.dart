@@ -1,8 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:todo_tutorial/firestore_service/firestore_functions.dart';
 import 'package:todo_tutorial/widgets/allTodotitle.dart';
 import 'package:todo_tutorial/widgets/emptyList.dart';
-import 'package:todo_tutorial/widgets/todoWidget.dart';
-import 'data/todoData.dart';
+import 'package:todo_tutorial/widgets/todolist.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -58,8 +59,8 @@ class _HomeState extends State<Home> {
                 color: Colors.black,
                 onPressed: () {
                   print("Todo Created");
+                  createTodos(_todoController.text);
                   setState(() {
-                    todo.add(_todoController.text);
                     _todoController.clear();
                   });
                 },
@@ -76,18 +77,21 @@ class _HomeState extends State<Home> {
             SizedBox(
               height: 15,
             ),
-            todo.length == 0
-                ? emptyList()
-                : Expanded(
-                    child: ListView.builder(
-                    itemCount: todo.length,
-                    itemBuilder: (context, index) {
-                      return Dismissible(
-                          key: Key(todo[index]),
-                          onDismissed: (direction) => todo.remove(todo[index]),
-                          child: todoWidget(todo[index]));
-                    },
-                  )),
+            StreamBuilder(
+              stream:
+                  FirebaseFirestore.instance.collection("Todos").snapshots(),
+              builder: (context, snapshots) {
+                if (snapshots.hasData) {
+                  return snapshots.data.documents.length == 0
+                      ? emptyList()
+                      : todoList(snapshots);
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              },
+            ),
           ],
         ),
       ),
