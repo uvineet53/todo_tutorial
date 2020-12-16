@@ -1,7 +1,8 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:date_format/date_format.dart';
-import 'package:todo_tutorial/constants.dart';
+import 'package:todo_tutorial/widgets/allTodotitle.dart';
+import 'package:todo_tutorial/widgets/emptyList.dart';
+import 'package:todo_tutorial/widgets/todoWidget.dart';
+import 'data/todoData.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -9,120 +10,85 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  TextEditingController _todoController = new TextEditingController();
-  List<Map<String, dynamic>> todo = [];
+  var _todoController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              headingText,
-              SizedBox(
-                height: 20,
+      appBar: AppBar(
+        title: Text(
+          "Todo",
+          style: TextStyle(
+              fontSize: 50, color: Colors.yellow, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        elevation: 0.0,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.blue[100],
+                borderRadius: BorderRadius.circular(12),
               ),
-              Container(
-                padding: EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.grey[200],
-                ),
-                child: TextField(
-                  controller: _todoController,
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
-                  decoration: InputDecoration(
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    hintText: "Add a new todo...",
-                    suffixIcon: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: Colors.black,
-                      ),
-                      child: IconButton(
-                        color: Colors.white,
-                        icon: Icon(Icons.add),
-                        onPressed: () {
-                          setState(() {
-                            _todoController.text != null ||
-                                    _todoController.text != ""
-                                ? todo.add({
-                                    "title": _todoController.text,
-                                    "date": "${formatDate(DateTime.now(), [
-                                      d,
-                                      ' ',
-                                      M,
-                                      '\'',
-                                      yy
-                                    ])}",
-                                    "color": colors[
-                                        Random().nextInt(colors.length - 1)],
-                                    "checked": false,
-                                  })
-                                : print("Text is null");
-                            _todoController.clear();
-                          });
-                        },
-                      ),
-                    ),
-                  ),
+              child: TextField(
+                controller: _todoController,
+                style: TextStyle(fontSize: 20),
+                decoration: InputDecoration(
+                  hintText: "Add a new Todo...",
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
                 ),
               ),
-              SizedBox(
-                height: 25,
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            SizedBox(
+              width: double.infinity,
+              child: RaisedButton(
+                padding: EdgeInsets.all(15),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                textColor: Colors.white,
+                color: Colors.black,
+                onPressed: () {
+                  print("Todo Created");
+                  setState(() {
+                    todo.add(_todoController.text);
+                    _todoController.clear();
+                  });
+                },
+                child: Text(
+                  "Create Todo",
+                  style: TextStyle(fontSize: 24),
+                ),
               ),
-              allTodo,
-              SizedBox(
-                height: 10,
-              ),
-              Expanded(
-                child: todo.length == 0
-                    ? emptyList
-                    : ListView.builder(
-                        itemCount: todo.length,
-                        itemBuilder: (context, index) {
-                          print(todo.length);
-                          return Dismissible(
-                            key: Key("todo${todo[index]}"),
-                            onDismissed: (direction) {
-                              setState(() {
-                                todo.removeAt(index);
-                                print("removed at index $index");
-                              });
-                            },
-                            child: Container(
-                              margin: EdgeInsets.only(top: 10),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: todo[index]["color"],
-                              ),
-                              child: ListTile(
-                                leading: Checkbox(
-                                  value: todo[index]['checked'],
-                                  activeColor: Colors.black,
-                                  onChanged: (newValue) {
-                                    setState(() {
-                                      todo[index]["checked"] = newValue;
-                                      print("changed");
-                                    });
-                                  },
-                                ),
-                                title: Text(todo[index]["title"]),
-                                trailing: Text(todo[index]["date"]),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-              ),
-            ],
-          ),
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            allTodo(),
+            SizedBox(
+              height: 15,
+            ),
+            todo.length == 0
+                ? emptyList()
+                : Expanded(
+                    child: ListView.builder(
+                    itemCount: todo.length,
+                    itemBuilder: (context, index) {
+                      return Dismissible(
+                          key: Key(todo[index]),
+                          onDismissed: (direction) => todo.remove(todo[index]),
+                          child: todoWidget(todo[index]));
+                    },
+                  )),
+          ],
         ),
       ),
     );
